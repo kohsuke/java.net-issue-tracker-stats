@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class BugCountGraph extends Graph<XYDataset> {
     protected IntervalXYDataset buildDataSet(List<Activity> activities) throws IOException {
-        TimelineTrendCounter open = new TimelineTrendCounter();
-        TimelineTrendCounter total = new TimelineTrendCounter();
+        TimelineTrendBuilder open = new TimelineTrendBuilder();
+        TimelineTrendBuilder total = new TimelineTrendBuilder();
 
         for (Activity a : activities) {
             if(!a.isUpdate()) {
@@ -42,7 +42,7 @@ public class BugCountGraph extends Graph<XYDataset> {
                 open.inc(a);
         }
 
-        TrendCounter.completeMissingLinks(open,total);
+        TrendBuilder.completeMissingLinks(open,total);
 
         TimeTableXYDataset ds = new TimeTableXYDataset();
         open.addTo(ds,"open issues");
