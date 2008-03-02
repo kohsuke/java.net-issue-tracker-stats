@@ -117,14 +117,14 @@ public class IncomingOutgoingBugGraph {
         XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
         plot.setOrientation(PlotOrientation.VERTICAL);
         plot.setForegroundAlpha(0.8F);
-        renderer.setSeriesPaint(0,new Color(0,255,0));
-        renderer.setSeriesPaint(1,new Color(255,0,0));
+        renderer.setSeriesPaint(0,Color.GREEN);
+        renderer.setSeriesPaint(1,Color.RED);
 
         XYBarRenderer xybarrenderer = (XYBarRenderer)plot.getRenderer();
         xybarrenderer.setDrawBarOutline(false);
 
         JFreeChart chart = new JFreeChart("Created vs Resolved", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
-
+        chart.setBackgroundPaint(Color.WHITE);
         //  not working as expected
 //        // tick size should be int
 //        double tickSize = yAxis.getTickUnit().getSize();
