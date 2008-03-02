@@ -3,6 +3,8 @@ package org.jvnet.its;
 import java.awt.*;
 
 /**
+ * Colors used in the generated pictures.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class ColorPalette {
