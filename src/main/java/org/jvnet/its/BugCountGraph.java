@@ -4,7 +4,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYStepAreaRenderer;
-import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.xy.XYDataset;
@@ -14,96 +13,40 @@ import org.kohsuke.jnt.JNIssue.Activity;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * @author Kohsuke Kawaguchi
  */
 public class BugCountGraph extends Graph<XYDataset> {
-    protected IntervalXYDataset buildDataSet(final List<Activity> activities) throws IOException {
-        final TimeTableXYDataset ds = new TimeTableXYDataset();
+    protected IntervalXYDataset buildDataSet(List<Activity> activities) throws IOException {
+        TrendCounter open = new TrendCounter();
+        TrendCounter total = new TrendCounter();
 
-        /**
-         * Nested class so that we can define method-local functions.
-         */
-        class Counter {
-            final TreeMap<Calendar,Integer> openTrend = new TreeMap<Calendar,Integer>();
-            final TreeMap<Calendar,Integer> totalTrend = new TreeMap<Calendar,Integer>();
-
-            int open,total;
-
-            void inc(Activity a) {
-                open++;
-                openTrend.put(a.getTimestamp(), open);
+        for (Activity a : activities) {
+            if(!a.isUpdate()) {
+                open.inc(a);
+                total.inc(a);
+                continue;
             }
 
-            void dec(Activity a) {
-                open--;
-                openTrend.put(a.getTimestamp(), open);
-            }
+            if(a.getField()!= IssueField.STATUS)
+                continue;
 
-            void build() {
-                for (Activity a : activities) {
-                    if(!a.isUpdate()) {
-                        inc(a);
-                        totalTrend.put(a.getTimestamp(),++total);
-                        continue;
-                    }
+            IssueStatus o = IssueStatus.valueOf(a.getOldValue());
+            IssueStatus n = IssueStatus.valueOf(a.getNewValue());
 
-                    if(a.getField()!= IssueField.STATUS)
-                        continue;
-
-                    IssueStatus o = IssueStatus.valueOf(a.getOldValue());
-                    IssueStatus n = IssueStatus.valueOf(a.getNewValue());
-
-                    if(o.needsWork && !n.needsWork)
-                        dec(a);
-                    if(!o.needsWork && n.needsWork)
-                        inc(a);
-                }
-
-                completeMissingLinks(openTrend,totalTrend.keySet());
-                completeMissingLinks(totalTrend,openTrend.keySet());
-
-                addTrend(openTrend, "open issues");
-                addTrend(totalTrend, "total issues");
-            }
-
-            private void completeMissingLinks(TreeMap<Calendar,Integer> trend, Set<Calendar> dataPoints) {
-                for (Calendar dp : dataPoints) {
-                    Entry<Calendar, Integer> e = trend.floorEntry(dp);
-                    if(e==null)
-                        trend.put(dp,0);
-                    else
-                        trend.put(dp,e.getValue());
-                }
-            }
-
-            private void addTrend(Map<Calendar, Integer> trend, String seriesName) {
-                Entry<Calendar,Integer> p = null;
-                for (Entry<Calendar,Integer> e : trend.entrySet()) {
-                    if(p!=null) {
-                        add(p,e.getKey().getTime(),seriesName);
-                    }
-                    p = e;
-                }
-                if(p!=null)
-                    add(p,new Date(),seriesName);
-            }
-
-            private void add(Entry<Calendar, Integer> p, Date end, String seriesName) {
-                ds.add(new SimpleTimePeriod(p.getKey().getTime(),end),
-                       p.getValue(), seriesName, false);
-            }
+            if(o.needsWork && !n.needsWork)
+                open.dec(a);
+            if(!o.needsWork && n.needsWork)
+                open.inc(a);
         }
 
-        new Counter().build();
+        TrendCounter.completeMissingLinks(open,total);
+
+        TimeTableXYDataset ds = new TimeTableXYDataset();
+        open.addTo(ds,"open issues");
+        total.addTo(ds,"total issues");
 
         saveDataset(ds);
 
