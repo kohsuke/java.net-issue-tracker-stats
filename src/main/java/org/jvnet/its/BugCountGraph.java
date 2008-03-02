@@ -108,16 +108,9 @@ public class BugCountGraph extends Graph {
         jfreechart.setBackgroundPaint(Color.WHITE);
 
         XYPlot plot = (XYPlot)jfreechart.getPlot();
-        plot.setRenderer(new XYStepAreaRenderer());
+        XYStepAreaRenderer renderer = new XYStepAreaRenderer();
+        plot.setRenderer(renderer);
 
-//        PeriodAxis periodaxis = new PeriodAxis("Date");
-//        periodaxis.setAutoRangeTimePeriodClass(org.jfree.data.time.Month.class);
-//        periodaxis.setMajorTickTimePeriodClass(org.jfree.data.time.Month.class);
-//        PeriodAxisLabelInfo aperiodaxislabelinfo[] = new PeriodAxisLabelInfo[2];
-//        aperiodaxislabelinfo[0] = new PeriodAxisLabelInfo(org.jfree.data.time.Month.class, new SimpleDateFormat("MMM"), new RectangleInsets(2D, 2D, 2D, 2D), new Font("SansSerif", 1, 10), Color.blue, false, new BasicStroke(0.0F), Color.lightGray);
-//        aperiodaxislabelinfo[1] = new PeriodAxisLabelInfo(org.jfree.data.time.Year.class, new SimpleDateFormat("yyyy"));
-//        periodaxis.setLabelInfo(aperiodaxislabelinfo);
-//        plot.setDomainAxis(periodaxis);
         return jfreechart;
     }
 }
