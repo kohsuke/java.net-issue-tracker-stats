@@ -36,6 +36,11 @@ public class BugsLifeGraph extends Graph<TableXYDataset> {
 
         Collections.sort(activities,AGE_COMPARATOR);
 
+        // most of the time, long tail is not very interesting,
+        // so cut off at some arbitrary point
+
+        activities = activities.subList(0,(activities.size()*9+9)/10);
+
         for (Activity a : activities) {
             if(!a.isUpdate()) {
                 trends.get(a.getCurrentStatus()).inc(a);
