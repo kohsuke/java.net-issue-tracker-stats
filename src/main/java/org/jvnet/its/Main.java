@@ -3,6 +3,7 @@ package org.jvnet.its;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
 import org.kohsuke.jnt.JNIssue;
 import org.kohsuke.jnt.JNIssue.Activity;
 import org.kohsuke.jnt.JNProject;
@@ -21,6 +22,9 @@ import java.io.IOException;
 public class Main {
     @Argument
     public final List<String> projects = new ArrayList<String>();
+
+    @Option(name="-span",metaVar="[week|month]")
+    public TimePeriodFactory timePeriodFactory = TimePeriodFactory.MONTH;
 
     public static void main(String[] args) {
         System.exit(run(args));
@@ -60,10 +64,10 @@ public class Main {
                     activities.addAll(i.getActivities());
                 Collections.sort(activities);
 
-                new IncomingOutgoingBugGraph().generate(activities);
+                new IncomingOutgoingBugGraph(timePeriodFactory).generate(activities);
             }
         } else {
-            new IncomingOutgoingBugGraph().generate(new ArrayList<Activity>());
+            new IncomingOutgoingBugGraph(timePeriodFactory).generate(new ArrayList<Activity>());
         }
     }
 

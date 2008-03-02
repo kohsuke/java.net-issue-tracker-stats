@@ -10,7 +10,6 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.time.TimePeriod;
 import org.jfree.data.time.TimeTableXYDataset;
-import org.jfree.data.time.Week;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.kohsuke.jnt.IssueField;
 import org.kohsuke.jnt.IssueStatus;
@@ -24,10 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,54 +33,10 @@ import java.util.TreeMap;
  * @author Kohsuke Kawaguchi
  */
 public class IncomingOutgoingBugGraph {
-    /**
-     * X-axis is per week.
-     */
-    public static final class Label implements Comparable<Label>, Serializable {
-        public final int year;
-        public final int week;
+    private final TimePeriodFactory timePeriodFactory;
 
-        public Label(Calendar timestamp) {
-            year = timestamp.get(Calendar.YEAR);
-            week = timestamp.get(Calendar.WEEK_OF_YEAR);
-        }
-
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Label label = (Label) o;
-            return week == label.week && year == label.year;
-        }
-
-        public int hashCode() {
-            int result;
-            result = year;
-            result = 31 * result + week;
-            return result;
-        }
-
-        public int compareTo(Label that) {
-            if(this.year-that.year!=0)
-                return this.year-that.year;
-            return this.week-that.week;
-        }
-
-        public String toString() {
-            return DATE.format(toCalendar().getTime());
-        }
-
-        private GregorianCalendar toCalendar() {
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.set(Calendar.YEAR,year);
-            cal.set(Calendar.WEEK_OF_YEAR,week);
-            return cal;
-        }
-
-        public TimePeriod toTimePeriod() {
-            return new Week(toCalendar().getTime());
-        }
-
-        private static final long serialVersionUID = 1L;
+    public IncomingOutgoingBugGraph(TimePeriodFactory timePeriodFactory) {
+        this.timePeriodFactory = timePeriodFactory;
     }
 
     public void generate(List<Activity> activities) throws IOException {
@@ -109,8 +61,8 @@ public class IncomingOutgoingBugGraph {
     }
 
     private IntervalXYDataset buildDataSet(List<Activity> activities) throws IOException {
-        Map<Label,Integer> created = new TreeMap<Label,Integer>();
-        Map<Label,Integer> resolved = new TreeMap<Label,Integer>();
+        Map<TimePeriod,Integer> created = new TreeMap<TimePeriod,Integer>();
+        Map<TimePeriod,Integer> resolved = new TreeMap<TimePeriod,Integer>();
 
         for (Activity a : activities) {
             if(!a.isUpdate()) {
@@ -142,13 +94,13 @@ public class IncomingOutgoingBugGraph {
         return ds;
     }
 
-    private void buildDataSet(Map<Label, Integer> incoming, TimeTableXYDataset ds, String label) {
-        for (Entry<Label, Integer> e : incoming.entrySet())
-            ds.add(e.getKey().toTimePeriod(),e.getValue(),label,false);
+    private void buildDataSet(Map<TimePeriod,Integer> incoming, TimeTableXYDataset ds, String label) {
+        for (Entry<TimePeriod,Integer> e : incoming.entrySet())
+            ds.add(e.getKey(),e.getValue(),label,false);
     }
 
-    private void inc(Activity a, Map<Label, Integer> data) {
-        IncomingOutgoingBugGraph.Label l = new Label(a.getTimestamp());
+    private void inc(Activity a, Map<TimePeriod,Integer> data) {
+        TimePeriod l = timePeriodFactory.toTimePeriod(a.getTimestamp());
         Integer v = data.get(l);
         if(v==null) v=1;
         else        v=v+1;
