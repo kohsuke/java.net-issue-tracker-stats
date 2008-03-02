@@ -4,6 +4,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYStepAreaRenderer;
+import org.jfree.chart.renderer.xy.XYStepRenderer;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.data.xy.IntervalXYDataset;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.Set;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -45,24 +47,26 @@ public class BugCountGraph extends Graph {
          * Nested class so that we can define method-local functions.
          */
         class Counter {
-            final Map<Calendar,Integer> count = new TreeMap<Calendar,Integer>();
+            final TreeMap<Calendar,Integer> openTrend = new TreeMap<Calendar,Integer>();
+            final TreeMap<Calendar,Integer> totalTrend = new TreeMap<Calendar,Integer>();
 
-            int n=0;
+            int open,total;
 
             void inc(Activity a) {
-                n++;
-                count.put(a.getTimestamp(),n);
+                open++;
+                openTrend.put(a.getTimestamp(), open);
             }
 
             void dec(Activity a) {
-                n--;
-                count.put(a.getTimestamp(),n);
+                open--;
+                openTrend.put(a.getTimestamp(), open);
             }
 
             void build() {
                 for (Activity a : activities) {
                     if(!a.isUpdate()) {
                         inc(a);
+                        totalTrend.put(a.getTimestamp(),++total);
                         continue;
                     }
 
@@ -78,20 +82,38 @@ public class BugCountGraph extends Graph {
                         inc(a);
                 }
 
+                completeMissingLinks(openTrend,totalTrend.keySet());
+                completeMissingLinks(totalTrend,openTrend.keySet());
+
+                addTrend(openTrend, "open issues");
+                addTrend(totalTrend, "total issues");
+            }
+
+            private void completeMissingLinks(TreeMap<Calendar,Integer> trend, Set<Calendar> dataPoints) {
+                for (Calendar dp : dataPoints) {
+                    Entry<Calendar, Integer> e = trend.floorEntry(dp);
+                    if(e==null)
+                        trend.put(dp,0);
+                    else
+                        trend.put(dp,e.getValue());
+                }
+            }
+
+            private void addTrend(Map<Calendar, Integer> trend, String seriesName) {
                 Entry<Calendar,Integer> p = null;
-                for (Entry<Calendar,Integer> e : count.entrySet()) {
+                for (Entry<Calendar,Integer> e : trend.entrySet()) {
                     if(p!=null) {
-                        add(p,e.getKey().getTime());
+                        add(p,e.getKey().getTime(),seriesName);
                     }
                     p = e;
                 }
                 if(p!=null)
-                    add(p,new Date());
+                    add(p,new Date(),seriesName);
             }
 
-            private void add(Entry<Calendar, Integer> p, Date end) {
+            private void add(Entry<Calendar, Integer> p, Date end, String seriesName) {
                 ds.add(new SimpleTimePeriod(p.getKey().getTime(),end),
-                       p.getValue(), "# of issues", false);
+                       p.getValue(), seriesName, false);
             }
         }
 
@@ -104,12 +126,14 @@ public class BugCountGraph extends Graph {
 
     private JFreeChart createChart(IntervalXYDataset dataset) {
         JFreeChart jfreechart = ChartFactory.createTimeSeriesChart(
-            null, "time", "# of issues", dataset, false, false, false);
+            null, "time", "# of issues", dataset, true, false, false);
         jfreechart.setBackgroundPaint(Color.WHITE);
 
         XYPlot plot = (XYPlot)jfreechart.getPlot();
         XYStepAreaRenderer renderer = new XYStepAreaRenderer();
         plot.setRenderer(renderer);
+        renderer.setSeriesPaint(0,Color.RED);
+        renderer.setSeriesPaint(1,Color.GREEN);
 
         return jfreechart;
     }

@@ -64,13 +64,17 @@ public class Main {
                     activities.addAll(i.getActivities());
                 Collections.sort(activities);
 
-                new CreatedVsResolvedGraph(timePeriodFactory).generate(activities);
-                new BugCountGraph().generate(activities);
+                generateGraphs(activities);
             }
         } else {
-            new CreatedVsResolvedGraph(timePeriodFactory).generate(new ArrayList<Activity>());
+            generateGraphs(new ArrayList<Activity>());
         }
     }
 
-    static boolean full = true;
+    private void generateGraphs(List<Activity> activities) throws IOException {
+        new CreatedVsResolvedGraph(timePeriodFactory).generate(activities);
+        new BugCountGraph().generate(activities);
+    }
+
+    static boolean full = false;
 }
