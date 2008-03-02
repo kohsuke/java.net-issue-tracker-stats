@@ -64,10 +64,10 @@ public class Main {
                     activities.addAll(i.getActivities());
                 Collections.sort(activities);
 
-                new IncomingOutgoingBugGraph(timePeriodFactory).generate(activities);
+                new CreatedVsResolvedGraph(timePeriodFactory).generate(activities);
             }
         } else {
-            new IncomingOutgoingBugGraph(timePeriodFactory).generate(new ArrayList<Activity>());
+            new CreatedVsResolvedGraph(timePeriodFactory).generate(new ArrayList<Activity>());
         }
     }
 
