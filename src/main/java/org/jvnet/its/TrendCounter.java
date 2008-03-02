@@ -1,32 +1,31 @@
 package org.jvnet.its;
 
-import org.jfree.data.time.SimpleTimePeriod;
-import org.jfree.data.time.TimeTableXYDataset;
+import org.jfree.data.xy.XYDataset;
 import org.kohsuke.jnt.JNIssue.Activity;
 
-import java.util.Calendar;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Arrays;
 
 /**
  * @author Kohsuke Kawaguchi
  */
-public class TrendCounter {
-    private final TreeMap<Calendar,Integer> trend = new TreeMap<Calendar,Integer>();
+public abstract class TrendCounter<K extends Comparable<K>, DS extends XYDataset> {
+    private final TreeMap<K,Integer> trend = new TreeMap<K,Integer>();
     private int n;
 
     public void inc(Activity a) {
         n++;
-        trend.put(a.getTimestamp(), n);
+        trend.put(getKey(a), n);
     }
+
+    protected abstract K getKey(Activity a);
 
     public void dec(Activity a) {
         n--;
-        trend.put(a.getTimestamp(), n);
+        trend.put(getKey(a), n);
     }
 
     /**
@@ -44,9 +43,9 @@ public class TrendCounter {
         completeMissingLinks(Arrays.asList(counters));
     }
 
-    private void completeMissingLinks(Set<Calendar> dataPoints) {
-        for (Calendar dp : dataPoints) {
-            Entry<Calendar, Integer> e = trend.floorEntry(dp);
+    private void completeMissingLinks(Set<K> dataPoints) {
+        for (K dp : dataPoints) {
+            Entry<K,Integer> e = trend.floorEntry(dp);
             if(e==null)
                 trend.put(dp,0);
             else
@@ -57,19 +56,19 @@ public class TrendCounter {
     /**
      * Adds this trend to the given data set.
      */
-    public void addTo(TimeTableXYDataset ds, String seriesName) {
-        Entry<Calendar,Integer> p = null;
-        for (Entry<Calendar,Integer> e : trend.entrySet()) {
+    public void addTo(DS ds, String seriesName) {
+        Entry<K,Integer> p = null;
+        for (Entry<K,Integer> e : trend.entrySet()) {
             if(p!=null)
-                add(ds,p,e.getKey().getTime(),seriesName);
+                add(ds,p.getKey(),e.getKey(),p.getValue(),seriesName);
             p = e;
         }
         if(p!=null)
-            add(ds,p,new Date(),seriesName);
+            add(ds,p.getKey(),null,p.getValue(),seriesName);
     }
 
-    private void add(TimeTableXYDataset ds, Entry<Calendar,Integer> p, Date end, String seriesName) {
-        ds.add(new SimpleTimePeriod(p.getKey().getTime(),end),
-               p.getValue(), seriesName, false);
-    }
+    /**
+     * Lower-level function to add data to the dataset.
+     */
+    protected abstract void add(DS ds, K start, K end, int value, String seriesName);
 }
