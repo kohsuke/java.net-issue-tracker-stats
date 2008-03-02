@@ -3,6 +3,8 @@ package org.jvnet.its;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.CategoryTableXYDataset;
 import org.jfree.data.xy.TableXYDataset;
 import org.kohsuke.jnt.IssueField;
@@ -52,22 +54,29 @@ public class BugsLifeGraph extends Graph<TableXYDataset> {
         for (Entry<IssueStatus,AgeTrendBuilder> e : trends.entrySet())
             e.getValue().addTo(ds,e.getKey().name());
 
+        saveDataset(ds);
+
         return ds;
     }
 
     protected JFreeChart createChart(TableXYDataset dataset) {
-        JFreeChart jfreechart = ChartFactory.createStackedXYAreaChart(
-            null, "time", "# of issues", dataset, PlotOrientation.VERTICAL, true, false, false);
-        jfreechart.setBackgroundPaint(Color.WHITE);
+        JFreeChart chart = ChartFactory.createStackedXYAreaChart(
+            null, "days", "# of issues", dataset, PlotOrientation.VERTICAL, true, false, false);
+        chart.setBackgroundPaint(Color.WHITE);
 
-//        XYPlot plot = (XYPlot)jfreechart.getPlot();
-//        XYStepAreaRenderer renderer = new StackedXYStepAreaRenderer();
-//        plot.setRenderer(renderer);
-        
-//        renderer.setSeriesPaint(0,ColorPalette.RED);
-//        renderer.setSeriesPaint(1,ColorPalette.GREEN);
+        XYPlot plot = (XYPlot)chart.getPlot();
+        XYItemRenderer renderer = plot.getRenderer();
 
-        return jfreechart;
+//        plot.setForegroundAlpha(0.8f);
+        renderer.setSeriesPaint(0,ColorPalette.DARK_RED);
+        renderer.setSeriesPaint(1,ColorPalette.RED);
+        renderer.setSeriesPaint(2,ColorPalette.DARK_YELLOW);
+        renderer.setSeriesPaint(3,ColorPalette.YELLOW);
+        renderer.setSeriesPaint(4,ColorPalette.GREEN);
+        renderer.setSeriesPaint(5,ColorPalette.DARK_GREEN);
+        renderer.setSeriesPaint(6,Color.WHITE);
+
+        return chart;
     }
 
     protected String getImageName() {
