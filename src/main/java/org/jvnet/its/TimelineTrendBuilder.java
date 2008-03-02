@@ -8,6 +8,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
+ * {@link TrendBuilder} where the type of <tt>x</tt>
+ * is a date when an activity happened. 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class TimelineTrendBuilder extends TrendBuilder<Calendar,TimeTableXYDataset> {
