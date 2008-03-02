@@ -71,5 +71,5 @@ public class Main {
         }
     }
 
-    static boolean full = true;
+    static boolean full = false;
 }
