@@ -76,5 +76,5 @@ public class Main {
         new BugCountGraph().generate(activities);
     }
 
-    static boolean full = false;
+    static boolean full = true;
 }
