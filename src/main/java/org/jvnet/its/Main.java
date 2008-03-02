@@ -10,11 +10,11 @@ import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.JavaNet;
 import org.kohsuke.jnt.ProcessingException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.io.IOException;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -65,11 +65,12 @@ public class Main {
                 Collections.sort(activities);
 
                 new CreatedVsResolvedGraph(timePeriodFactory).generate(activities);
+                new BugCountGraph().generate(activities);
             }
         } else {
             new CreatedVsResolvedGraph(timePeriodFactory).generate(new ArrayList<Activity>());
         }
     }
 
-    static boolean full = false;
+    static boolean full = true;
 }

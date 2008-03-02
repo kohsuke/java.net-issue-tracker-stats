@@ -1,8 +1,8 @@
 package org.jvnet.its;
 
+import org.jfree.data.time.Month;
 import org.jfree.data.time.TimePeriod;
 import org.jfree.data.time.Week;
-import org.jfree.data.time.Month;
 
 import java.util.Calendar;
 

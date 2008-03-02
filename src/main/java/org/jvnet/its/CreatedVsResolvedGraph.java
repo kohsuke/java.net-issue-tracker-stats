@@ -15,15 +15,9 @@ import org.kohsuke.jnt.IssueField;
 import org.kohsuke.jnt.IssueStatus;
 import org.kohsuke.jnt.JNIssue.Activity;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,7 +26,7 @@ import java.util.TreeMap;
 /**
  * @author Kohsuke Kawaguchi
  */
-public class CreatedVsResolvedGraph {
+public class CreatedVsResolvedGraph extends Graph {
     private final TimePeriodFactory timePeriodFactory;
 
     public CreatedVsResolvedGraph(TimePeriodFactory timePeriodFactory) {
@@ -41,23 +35,14 @@ public class CreatedVsResolvedGraph {
 
     public void generate(List<Activity> activities) throws IOException {
         IntervalXYDataset ds;
-        if(Main.full) {
+        if(Main.full)
             ds = buildDataSet(activities);
-        } else {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./data.out"));
-            try {
-                ds = (IntervalXYDataset)ois.readObject();
-            } catch (ClassNotFoundException e) {
-                throw new IOException(e);
-            }
-        }
+        else
+            ds = (IntervalXYDataset) loadDataset();
 
         JFreeChart chart = createChart(ds);
 
-        BufferedImage image = chart.createBufferedImage(640,480);
-        FileOutputStream fos = new FileOutputStream("graph.png");
-        ImageIO.write(image, "PNG", fos);
-        fos.close();
+        write(chart,new File("created-vs-resolved.png"));
     }
 
     private IntervalXYDataset buildDataSet(List<Activity> activities) throws IOException {
@@ -87,9 +72,7 @@ public class CreatedVsResolvedGraph {
         buildDataSet(resolved, ds, "resolved");
         buildDataSet(created, ds, "created");
 
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("./data.out"));
-        oos.writeObject(ds);
-        oos.close();
+        saveDataset(ds);
 
         return ds;
     }
@@ -147,6 +130,4 @@ public class CreatedVsResolvedGraph {
     private boolean isInt(double v) {
         return Math.floor(v)==v;
     }
-
-    private static final SimpleDateFormat DATE = new SimpleDateFormat("yyyy/MM/dd");
 }
