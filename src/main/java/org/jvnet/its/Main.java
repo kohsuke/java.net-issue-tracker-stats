@@ -35,6 +35,11 @@ public class Main {
         CmdLineParser parser = new CmdLineParser(main);
         try {
             parser.parseArgument(args);
+            if(main.projects.isEmpty()) {
+                System.err.println("No project is given");
+                parser.printUsage(System.err);
+                return -1;
+            }
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
             parser.printUsage(System.err);
