@@ -2,6 +2,7 @@ package org.jvnet.its;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -14,6 +15,9 @@ import org.kohsuke.jnt.JNIssue.Activity;
 
 import java.awt.*;
 import java.io.IOException;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -59,9 +63,9 @@ public class BugsLifeGraph extends Graph<TableXYDataset> {
         return ds;
     }
 
-    protected JFreeChart createChart(TableXYDataset dataset) {
+    protected JFreeChart createChart(final TableXYDataset dataset) {
         JFreeChart chart = ChartFactory.createStackedXYAreaChart(
-            null, "days", "# of issues", dataset, PlotOrientation.VERTICAL, true, false, false);
+            null, "days", "ratio", dataset, PlotOrientation.VERTICAL, true, false, false);
         chart.setBackgroundPaint(Color.WHITE);
 
         XYPlot plot = (XYPlot)chart.getPlot();
@@ -75,8 +79,37 @@ public class BugsLifeGraph extends Graph<TableXYDataset> {
         renderer.setSeriesPaint(4,ColorPalette.GREEN);
         renderer.setSeriesPaint(5,ColorPalette.DARK_GREEN);
         renderer.setSeriesPaint(6,Color.WHITE);
+        final int totalIssues = getTotalIssues(dataset);
+
+
+        // format Y-axis as the percentage
+        NumberAxis y = (NumberAxis)plot.getRangeAxis();
+        y.setNumberFormatOverride(new NumberFormat() {
+            final NumberFormat pformat = NumberFormat.getPercentInstance();
+
+            public StringBuffer format(double number, StringBuffer toAppendTo, FieldPosition pos) {
+                return pformat.format(number/totalIssues,toAppendTo,pos);
+            }
+
+            public StringBuffer format(long number, StringBuffer toAppendTo, FieldPosition pos) {
+                return format((double)number,toAppendTo,pos);
+            }
+
+            public Number parse(String source, ParsePosition parsePosition) {
+                throw new UnsupportedOperationException();
+            }
+        });
+
+        y.setRange(0,totalIssues);
 
         return chart;
+    }
+
+    private int getTotalIssues(TableXYDataset dataset) {
+        int totalIssues = 0;
+        for( int i=0; i<dataset.getSeriesCount(); i++ )
+            totalIssues+= dataset.getYValue(i,0);
+        return totalIssues;
     }
 
     protected String getImageName() {
