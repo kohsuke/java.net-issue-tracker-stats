@@ -51,18 +51,18 @@ public abstract class TrendBuilder<K extends Comparable<K>, DS extends XYDataset
      * Auguments the trend data among each other
      * so that we have data points for all the dates.
      */
-    public static void completeMissingLinks(Collection<TrendBuilder> builders) {
+    public static void completeMissingLinks(Collection<? extends TrendBuilder> builders) {
         for (TrendBuilder x : builders)
             for (TrendBuilder y : builders)
                 if(x!=y)
-                    x.completeMissingLinks(y.trend.keySet());
+                    x.complete(y.trend.keySet());
     }
 
     public static void completeMissingLinks(TrendBuilder... builders) {
         completeMissingLinks(Arrays.asList(builders));
     }
 
-    private void completeMissingLinks(Set<K> dataPoints) {
+    private void complete(Set<K> dataPoints) {
         for (K dp : dataPoints) {
             Entry<K,Integer> e = trend.floorEntry(dp);
             if(e==null)

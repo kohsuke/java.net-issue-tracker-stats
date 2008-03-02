@@ -74,6 +74,7 @@ public class Main {
     private void generateGraphs(List<Activity> activities) throws IOException {
         new CreatedVsResolvedGraph(timePeriodFactory).generate(activities);
         new BugCountGraph().generate(activities);
+        new BugsLifeGraph().generate(activities);
     }
 
     static boolean full = true;
