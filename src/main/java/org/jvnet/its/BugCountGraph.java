@@ -132,8 +132,8 @@ public class BugCountGraph extends Graph {
         XYPlot plot = (XYPlot)jfreechart.getPlot();
         XYStepAreaRenderer renderer = new XYStepAreaRenderer();
         plot.setRenderer(renderer);
-        renderer.setSeriesPaint(0,Color.RED);
-        renderer.setSeriesPaint(1,Color.GREEN);
+        renderer.setSeriesPaint(0,ColorPalette.RED);
+        renderer.setSeriesPaint(1,ColorPalette.GREEN);
 
         return jfreechart;
     }

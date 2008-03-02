@@ -100,8 +100,8 @@ public class CreatedVsResolvedGraph extends Graph {
         XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
         plot.setOrientation(PlotOrientation.VERTICAL);
         plot.setForegroundAlpha(0.8F);
-        renderer.setSeriesPaint(0,Color.GREEN);
-        renderer.setSeriesPaint(1,Color.RED);
+        renderer.setSeriesPaint(0,ColorPalette.GREEN);
+        renderer.setSeriesPaint(1,ColorPalette.RED);
 
         XYBarRenderer xybarrenderer = (XYBarRenderer)plot.getRenderer();
         xybarrenderer.setDrawBarOutline(false);
