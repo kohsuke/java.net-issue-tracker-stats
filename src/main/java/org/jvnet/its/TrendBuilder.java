@@ -10,6 +10,25 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
+ * Builds a "trend" data, which is a function <tt>f(x):int</tt> defined
+ * as a series of intervals:
+ *
+ * <pre>
+ * f(x) := 0     if x &lt; x<sub>0</sub>
+ *      := i<sub>0</sub>   if x &#8714; [x<sub>0</sub>,x<sub>1</sub>)
+ *      := i<sub>1</sub>   if x &#8714; [x<sub>1</sub>,x<sub>2</sub>)
+ *      ...
+ * </pre>
+ *
+ * <p>
+ * f(x) is intended to be used to count something, and this class is designed
+ * to build f(x) by starting from smaller x and recording delta by using
+ * {@link #inc(Activity)} and {@link #dec(Activity)}.
+ *
+ * <p>
+ * <tt>x</tt> is normally a value of a time related dimension,
+ * but more details about <tt>x</tt> needs to be defined by subtypes. 
+ *
  * @author Kohsuke Kawaguchi
  */
 public abstract class TrendBuilder<K extends Comparable<K>, DS extends XYDataset> {
