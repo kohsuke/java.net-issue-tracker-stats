@@ -10,13 +10,12 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.time.TimePeriod;
 import org.jfree.data.time.TimeTableXYDataset;
-import org.jfree.data.xy.IntervalXYDataset;
+import org.jfree.data.xy.XYDataset;
 import org.kohsuke.jnt.IssueField;
 import org.kohsuke.jnt.IssueStatus;
 import org.kohsuke.jnt.JNIssue.Activity;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -26,26 +25,14 @@ import java.util.TreeMap;
 /**
  * @author Kohsuke Kawaguchi
  */
-public class CreatedVsResolvedGraph extends Graph {
+public class CreatedVsResolvedGraph extends Graph<XYDataset> {
     private final TimePeriodFactory timePeriodFactory;
 
     public CreatedVsResolvedGraph(TimePeriodFactory timePeriodFactory) {
         this.timePeriodFactory = timePeriodFactory;
     }
 
-    public void generate(List<Activity> activities) throws IOException {
-        IntervalXYDataset ds;
-        if(Main.full)
-            ds = buildDataSet(activities);
-        else
-            ds = (IntervalXYDataset) loadDataset();
-
-        JFreeChart chart = createChart(ds);
-
-        write(chart,new File("created-vs-resolved.png"));
-    }
-
-    private IntervalXYDataset buildDataSet(List<Activity> activities) throws IOException {
+    protected XYDataset buildDataSet(List<Activity> activities) throws IOException {
         Map<TimePeriod,Integer> created = new TreeMap<TimePeriod,Integer>();
         Map<TimePeriod,Integer> resolved = new TreeMap<TimePeriod,Integer>();
 
@@ -90,7 +77,11 @@ public class CreatedVsResolvedGraph extends Graph {
         data.put(l,v);
     }
 
-    private JFreeChart createChart(IntervalXYDataset dataset) {
+    protected String getImageName() {
+        return "created-vs-resolved.png";
+    }
+
+    protected JFreeChart createChart(XYDataset dataset) {
         DateAxis xAxis = new DateAxis("date");
 
         NumberAxis yAxis = new NumberAxis("# of issues");

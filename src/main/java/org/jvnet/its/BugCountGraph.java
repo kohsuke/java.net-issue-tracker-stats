@@ -4,43 +4,29 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYStepAreaRenderer;
-import org.jfree.chart.renderer.xy.XYStepRenderer;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.data.xy.IntervalXYDataset;
+import org.jfree.data.xy.XYDataset;
 import org.kohsuke.jnt.IssueField;
 import org.kohsuke.jnt.IssueStatus;
 import org.kohsuke.jnt.JNIssue.Activity;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * @author Kohsuke Kawaguchi
  */
-public class BugCountGraph extends Graph {
-    public void generate(List<Activity> activities) throws IOException {
-        IntervalXYDataset ds;
-        if(Main.full) {
-            ds = buildDataSet(activities);
-        } else {
-            ds = (IntervalXYDataset)loadDataset();
-        }
-
-        JFreeChart chart = createChart(ds);
-
-        write(chart,new File("count.png"));
-    }
-
-    private IntervalXYDataset buildDataSet(final List<Activity> activities) throws IOException {
+public class BugCountGraph extends Graph<XYDataset> {
+    protected IntervalXYDataset buildDataSet(final List<Activity> activities) throws IOException {
         final TimeTableXYDataset ds = new TimeTableXYDataset();
 
         /**
@@ -124,7 +110,11 @@ public class BugCountGraph extends Graph {
         return ds;
     }
 
-    private JFreeChart createChart(IntervalXYDataset dataset) {
+    protected String getImageName() {
+        return "count.png";
+    }
+
+    protected JFreeChart createChart(XYDataset dataset) {
         JFreeChart jfreechart = ChartFactory.createTimeSeriesChart(
             null, "time", "# of issues", dataset, true, false, false);
         jfreechart.setBackgroundPaint(Color.WHITE);

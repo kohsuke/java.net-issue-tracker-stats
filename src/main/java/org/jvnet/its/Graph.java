@@ -2,6 +2,7 @@ package org.jvnet.its;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.general.Dataset;
+import org.kohsuke.jnt.JNIssue.Activity;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -11,11 +12,28 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 
 /**
  * @author Kohsuke Kawaguchi
  */
-public abstract class Graph {
+public abstract class Graph<DS extends Dataset> {
+    public void generate(List<Activity> activities) throws IOException {
+        DS ds;
+        if(Main.full)
+            ds = buildDataSet(activities);
+        else
+            ds = (DS) loadDataset();
+
+        JFreeChart chart = createChart(ds);
+
+        write(chart,new File(getImageName()));
+    }
+
+    protected abstract String getImageName();
+    protected abstract JFreeChart createChart(DS ds);
+    protected abstract DS buildDataSet(List<Activity> activities) throws IOException;
+
     /**
      * Debug method.
      */
