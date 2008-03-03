@@ -100,4 +100,5 @@ public class Main {
 
     // for debugging.
     static boolean full = true;
+    static boolean debug = false;
 }

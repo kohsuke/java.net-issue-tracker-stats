@@ -49,6 +49,7 @@ public abstract class Graph<DS extends Dataset> {
     }
 
     protected void saveDataset(Dataset ds) throws IOException {
+        if(!Main.debug) return;
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(getDataFile()));
         oos.writeObject(ds);
         oos.close();
