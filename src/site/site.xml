@@ -8,8 +8,11 @@
 
   <body>
    <menu name="Overview">
-      <item name="Home"                    href="/index.html"/>
-      <item name="Download"                href="http://download.java.net/maven/2/org/jvnet/its/issuetracker-stats/"/>
+      <item name="Home"                   href="/index.html"/>
+      <item name="Download"               href="http://download.java.net/maven/2/org/jvnet/its/issuetracker-stats/"/>
+      <item name="Issue tracker"          href="/issues/"/>
+      <item name="Source code"            href="/source/browse/issue-tracker-stats" />
+      <item name="Mailing lists"          href="/servlets/ProjectMailingListList" />
     </menu>
     ${reports}
   </body>
