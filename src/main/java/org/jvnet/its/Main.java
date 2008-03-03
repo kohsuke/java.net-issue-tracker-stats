@@ -23,7 +23,7 @@ public class Main {
     @Argument
     public final List<String> projects = new ArrayList<String>();
 
-    @Option(name="-span",metaVar="[week|month]")
+    @Option(name="-span",metaVar="[week|month]",usage="Specifies the timespan for histogram")
     public TimePeriodFactory timePeriodFactory = TimePeriodFactory.MONTH;
 
     public static void main(String[] args) {
@@ -37,12 +37,12 @@ public class Main {
             parser.parseArgument(args);
             if(main.projects.isEmpty()) {
                 System.err.println("No project is given");
-                parser.printUsage(System.err);
+                printUsage(parser);
                 return -1;
             }
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
-            parser.printUsage(System.err);
+            printUsage(parser);
             return -1;
         }
 
@@ -53,6 +53,11 @@ public class Main {
             e.printStackTrace();
             return -1;
         }
+    }
+
+    private static void printUsage(CmdLineParser parser) {
+        System.err.println("Usage: java -jar issuetracker-stats.jar <java.net project> ...")
+        parser.printUsage(System.err);
     }
 
     public void execute() throws ProcessingException, IOException {
