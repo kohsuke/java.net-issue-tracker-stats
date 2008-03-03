@@ -56,7 +56,7 @@ public class Main {
     }
 
     private static void printUsage(CmdLineParser parser) {
-        System.err.println("Usage: java -jar issuetracker-stats.jar <java.net project> ...")
+        System.err.println("Usage: java -jar issuetracker-stats.jar <java.net project> ...");
         parser.printUsage(System.err);
     }
 
