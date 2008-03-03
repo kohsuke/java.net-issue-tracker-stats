@@ -9,9 +9,12 @@ import org.kohsuke.jnt.JNIssue.Activity;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.JavaNet;
 import org.kohsuke.jnt.ProcessingException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -88,6 +91,11 @@ public class Main {
         new CreatedVsResolvedGraph(timePeriodFactory).generate(activities,dir);
         new BugCountGraph().generate(activities,dir);
         new BugsLifeGraph().generate(activities,dir);
+
+        // generate index.html
+        FileOutputStream out = new FileOutputStream(new File(dir, "index.html"));
+        IOUtils.copy(getClass().getResourceAsStream("index.html"),out);
+        out.close();
     }
 
     // for debugging.
