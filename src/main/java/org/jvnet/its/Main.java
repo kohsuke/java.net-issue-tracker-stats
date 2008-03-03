@@ -11,6 +11,7 @@ import org.kohsuke.jnt.JavaNet;
 import org.kohsuke.jnt.ProcessingException;
 
 import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -74,18 +75,21 @@ public class Main {
                     activities.addAll(i.getActivities());
                 Collections.sort(activities);
 
-                generateGraphs(activities);
+                File dir = new File(project);
+                dir.mkdirs();
+                generateGraphs(activities, dir);
             }
         } else {
-            generateGraphs(new ArrayList<Activity>());
+            generateGraphs(new ArrayList<Activity>(),new File("."));
         }
     }
 
-    private void generateGraphs(List<Activity> activities) throws IOException {
-        new CreatedVsResolvedGraph(timePeriodFactory).generate(activities);
-        new BugCountGraph().generate(activities);
-        new BugsLifeGraph().generate(activities);
+    private void generateGraphs(List<Activity> activities,File dir) throws IOException {
+        new CreatedVsResolvedGraph(timePeriodFactory).generate(activities,dir);
+        new BugCountGraph().generate(activities,dir);
+        new BugsLifeGraph().generate(activities,dir);
     }
 
+    // for debugging.
     static boolean full = true;
 }

@@ -18,7 +18,7 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public abstract class Graph<DS extends Dataset> {
-    public void generate(List<Activity> activities) throws IOException {
+    public void generate(List<Activity> activities, File outDir) throws IOException {
         DS ds;
         if(Main.full)
             ds = buildDataSet(activities);
@@ -27,7 +27,7 @@ public abstract class Graph<DS extends Dataset> {
 
         JFreeChart chart = createChart(ds);
 
-        write(chart,new File(getImageName()));
+        write(chart,new File(outDir,getImageName()));
     }
 
     protected abstract String getImageName();
