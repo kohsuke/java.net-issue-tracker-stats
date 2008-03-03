@@ -15,6 +15,11 @@
     </repository>
   </repositories>
 
+  <scm>
+    <connection>scm:svn:https://svn.dev.java.net/svn/issue-tracker-stats/trunk/issue-tracker-stats/</connection>
+    <developerConnection>scm:svn:https://svn.dev.java.net/svn/issue-tracker-stats/trunk/issue-tracker-stats/</developerConnection>
+  </scm>
+
   <build>
     <plugins>
       <plugin>
