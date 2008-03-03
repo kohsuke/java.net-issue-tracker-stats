@@ -1,5 +1,6 @@
 package org.jvnet.its;
 
+import org.apache.commons.io.IOUtils;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -9,8 +10,6 @@ import org.kohsuke.jnt.JNIssue.Activity;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.JavaNet;
 import org.kohsuke.jnt.ProcessingException;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,6 +28,9 @@ public class Main {
 
     @Option(name="-span",metaVar="[week|month]",usage="Specifies the timespan for histogram")
     public TimePeriodFactory timePeriodFactory = TimePeriodFactory.MONTH;
+
+    @Option(name="-debug")
+    public static boolean debug = false;
 
     public static void main(String[] args) {
         System.exit(run(args));
@@ -100,5 +102,4 @@ public class Main {
 
     // for debugging.
     static boolean full = true;
-    static boolean debug = false;
 }
