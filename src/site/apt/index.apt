@@ -1,0 +1,27 @@
+                                    ------
+                                    Issue tracker stats
+                                    ------
+                                    Kohsuke Kawaguchi
+                                    ------
+                                    ------
+
+   This tool generates statistics from java.net issue trackers.
+
+How to run
+
+   Once you download the tool, consult {{{https://javanettasks.dev.java.net/nonav/maven/config.html}this document}}
+   for setting up java.net user ID and password, to be used for accessing java.net.
+   After that, run the tool like this:
+
+------------------------------
+java -jar issue-tracker-stats-jar-with-dependencies.jar <project> ...
+------------------------------
+
+   The tool takes a long time to run and that is normal. This is because it accesses
+   the issue tracker to obtain necessary information.
+
+   After the execution completes, you should see sub-directories with project names
+   and generated graphs in them.
+
+Sample output
+ 
