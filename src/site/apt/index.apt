@@ -24,4 +24,5 @@ java -jar issue-tracker-stats-jar-with-dependencies.jar <project> ...
    and generated graphs in them.
 
 Sample output
- 
+
+   Follow {{{sample/}this link}} for a sample report.
