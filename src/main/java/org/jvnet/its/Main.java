@@ -29,6 +29,9 @@ public class Main {
     @Option(name="-span",metaVar="[week|month]",usage="Specifies the timespan for histogram")
     public TimePeriodFactory timePeriodFactory = TimePeriodFactory.MONTH;
 
+    @Option(name="-o",usage="Specifies the output directory")
+    public File outputDirectory = new File(".");
+
     @Option(name="-debug")
     public static boolean debug = false;
 
@@ -80,12 +83,12 @@ public class Main {
                     activities.addAll(i.getActivities());
                 Collections.sort(activities);
 
-                File dir = new File(project);
+                File dir = new File(outputDirectory,project);
                 dir.mkdirs();
                 generateGraphs(activities, dir);
             }
         } else {
-            generateGraphs(new ArrayList<Activity>(),new File("."));
+            generateGraphs(new ArrayList<Activity>(),outputDirectory);
         }
     }
 
