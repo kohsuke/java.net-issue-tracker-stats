@@ -75,31 +75,35 @@ public class Main {
             for (String project : projects) {
                 JNProject p = con.getProject(project);
                 System.err.println("Working on "+project);
-                Map<Integer,JNIssue> allIssues = p.getIssueTracker().getAll();
-
-                // sort all activities in the time line order
-                List<JNIssue.Activity> activities = new ArrayList<Activity>();
-                for (JNIssue i : allIssues.values())
-                    activities.addAll(i.getActivities());
-                Collections.sort(activities);
-
-                File dir = new File(outputDirectory,project);
+                File dir = new File(outputDirectory, p.getName());
                 dir.mkdirs();
-                generateGraphs(activities, dir);
+                generate(p, dir, timePeriodFactory);
             }
         } else {
-            generateGraphs(new ArrayList<Activity>(),outputDirectory);
+            generateGraphs(new ArrayList<Activity>(),outputDirectory, timePeriodFactory);
         }
     }
 
-    private void generateGraphs(List<Activity> activities,File dir) throws IOException {
+    public static void generate(JNProject p, File dir, TimePeriodFactory timePeriodFactory) throws ProcessingException, IOException {
+        Map<Integer,JNIssue> allIssues = p.getIssueTracker().getAll();
+
+        // sort all activities in the time line order
+        List<Activity> activities = new ArrayList<Activity>();
+        for (JNIssue i : allIssues.values())
+            activities.addAll(i.getActivities());
+        Collections.sort(activities);
+
+        generateGraphs(activities, dir, timePeriodFactory);
+    }
+
+    private static void generateGraphs(List<Activity> activities, File dir, TimePeriodFactory timePeriodFactory) throws IOException {
         new CreatedVsResolvedGraph(timePeriodFactory).generate(activities,dir);
         new BugCountGraph().generate(activities,dir);
         new BugsLifeGraph().generate(activities,dir);
 
         // generate index.html
         FileOutputStream out = new FileOutputStream(new File(dir, "index.html"));
-        IOUtils.copy(getClass().getResourceAsStream("index.html"),out);
+        IOUtils.copy(Main.class.getResourceAsStream("index.html"),out);
         out.close();
     }
 
