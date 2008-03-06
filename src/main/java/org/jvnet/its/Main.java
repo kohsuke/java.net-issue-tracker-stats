@@ -1,23 +1,18 @@
 package org.jvnet.its;
 
-import org.apache.commons.io.IOUtils;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import org.kohsuke.jnt.JNIssue;
 import org.kohsuke.jnt.JNIssue.Activity;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.JavaNet;
 import org.kohsuke.jnt.ProcessingException;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -27,10 +22,17 @@ public class Main {
     public final List<String> projects = new ArrayList<String>();
 
     @Option(name="-span",metaVar="[week|month]",usage="Specifies the timespan for histogram")
-    public TimePeriodFactory timePeriodFactory = TimePeriodFactory.MONTH;
+    public void setTimePeriodFactory(TimePeriodFactory tpf) {
+        generator.setTimePeriodFactory(tpf);
+    }
+
+    @Option(name="-o",usage="Specifies the output directory")
+    public File outputDirectory = new File(".");
 
     @Option(name="-debug")
     public static boolean debug = false;
+
+    private final Generator generator = new Generator();
 
     public static void main(String[] args) {
         System.exit(run(args));
@@ -72,32 +74,13 @@ public class Main {
             for (String project : projects) {
                 JNProject p = con.getProject(project);
                 System.err.println("Working on "+project);
-                Map<Integer,JNIssue> allIssues = p.getIssueTracker().getAll();
-
-                // sort all activities in the time line order
-                List<JNIssue.Activity> activities = new ArrayList<Activity>();
-                for (JNIssue i : allIssues.values())
-                    activities.addAll(i.getActivities());
-                Collections.sort(activities);
-
-                File dir = new File(project);
+                File dir = new File(outputDirectory, p.getName());
                 dir.mkdirs();
-                generateGraphs(activities, dir);
+                generator.generate(p, dir);
             }
         } else {
-            generateGraphs(new ArrayList<Activity>(),new File("."));
+            generator.generateGraphs(new ArrayList<Activity>(),outputDirectory);
         }
-    }
-
-    private void generateGraphs(List<Activity> activities,File dir) throws IOException {
-        new CreatedVsResolvedGraph(timePeriodFactory).generate(activities,dir);
-        new BugCountGraph().generate(activities,dir);
-        new BugsLifeGraph().generate(activities,dir);
-
-        // generate index.html
-        FileOutputStream out = new FileOutputStream(new File(dir, "index.html"));
-        IOUtils.copy(getClass().getResourceAsStream("index.html"),out);
-        out.close();
     }
 
     // for debugging.
