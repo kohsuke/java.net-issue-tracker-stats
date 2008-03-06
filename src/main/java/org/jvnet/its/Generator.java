@@ -44,7 +44,9 @@ public class Generator {
 
         // generate index.html
         FileOutputStream out = new FileOutputStream(new File(dir, "index.html"));
+        out.write("<html><body>".getBytes());
         IOUtils.copy(Main.class.getResourceAsStream("index.html"),out);
+        out.write("</body></html>".getBytes());
         out.close();
     }
 }
