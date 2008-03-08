@@ -62,14 +62,20 @@ public abstract class TrendBuilder<K extends Comparable<K>, DS extends XYDataset
         completeMissingLinks(Arrays.asList(builders));
     }
 
-    private void complete(Set<K> dataPoints) {
-        for (K dp : dataPoints) {
-            Entry<K,Integer> e = trend.floorEntry(dp);
-            if(e==null)
-                trend.put(dp,0);
-            else
-                trend.put(dp,e.getValue());
+    public int get(K key) {
+        Entry<K,Integer> prev=null;
+        for (Entry<K,Integer> e : trend.entrySet()) {
+            if(e.getKey().compareTo(key)>0)
+                break;
+            prev = e;
         }
+        if(prev!=null)  return prev.getValue();
+        return 0;
+    }
+
+    private void complete(Set<K> dataPoints) {
+        for (K dp : dataPoints)
+            trend.put(dp,get(dp));
     }
 
     /**
