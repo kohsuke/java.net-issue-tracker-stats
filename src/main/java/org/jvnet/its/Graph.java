@@ -42,7 +42,9 @@ public abstract class Graph<DS extends Dataset> {
         try {
             return ois.readObject();
         } catch (ClassNotFoundException e) {
-            throw new IOException(e);
+            IOException x = new IOException(e.getMessage());
+            x.initCause(e);
+            throw x;
         } finally {
             ois.close();
         }
